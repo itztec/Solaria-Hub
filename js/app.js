@@ -35,15 +35,45 @@ class AppRouter {
         this.bindGlobalEvents();
     }
 
-    bindGlobalEvents() {
-        // Sidebar Toggle for Mobile / Desktop Collapsing
-        const toggleBtn = document.getElementById('sidebar-toggle');
+    closeMobileSidebar() {
         const sidebar = document.getElementById('sidebar');
+        const backdrop = document.getElementById('sidebar-backdrop') || document.querySelector('.sidebar-overlay-backdrop');
+        if (sidebar) sidebar.classList.remove('mobile-open');
+        if (backdrop) backdrop.classList.remove('active');
+    }
+
+    bindGlobalEvents() {
+        const toggleBtn = document.getElementById('sidebar-toggle');
+        const closeBtn = document.getElementById('mobile-close-sidebar-btn');
+        const sidebar = document.getElementById('sidebar');
+        const backdrop = document.getElementById('sidebar-backdrop');
+
         if (toggleBtn && sidebar) {
-            toggleBtn.addEventListener('click', () => {
-                sidebar.classList.toggle('mobile-open');
+            toggleBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isOpen = sidebar.classList.toggle('mobile-open');
+                if (backdrop) {
+                    if (isOpen) backdrop.classList.add('active');
+                    else backdrop.classList.remove('active');
+                }
             });
         }
+
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => this.closeMobileSidebar());
+        }
+
+        if (backdrop) {
+            backdrop.addEventListener('click', () => this.closeMobileSidebar());
+        }
+
+        // Event delegation for sidebar links (works even if DOM dynamically updates)
+        document.addEventListener('click', (e) => {
+            const link = e.target.closest('.sidebar-link');
+            if (link && window.innerWidth <= 768) {
+                this.closeMobileSidebar();
+            }
+        });
 
         // Logout action
         const logoutBtn = document.getElementById('nav-logout-btn');
@@ -56,6 +86,9 @@ class AppRouter {
     }
 
     async handleRoute() {
+        // Auto-close mobile drawer on route navigation
+        this.closeMobileSidebar();
+
         let hash = window.location.hash || '#dashboard';
         const routeKey = hash.split('?')[0];
 

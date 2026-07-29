@@ -24,11 +24,15 @@
 
         <!-- Main Workspace Shell (Sidebar + Topbar + Main Content View) -->
         <div id="app-shell" style="display: flex; width: 100%; min-height: 100vh;">
+            <!-- Mobile Backdrop Overlay -->
+            <div class="sidebar-overlay-backdrop" id="sidebar-backdrop"></div>
+
             <!-- Sidebar Navigation -->
             <aside class="sidebar" id="sidebar">
                 <div class="sidebar-header">
                     <div class="sidebar-brand-logo">☀️</div>
                     <div class="sidebar-brand-text"><span>Solaria</span> Hub</div>
+                    <button class="mobile-close-sidebar-btn" id="mobile-close-sidebar-btn" title="Close Menu">&times;</button>
                 </div>
 
                 <ul class="sidebar-menu">
