@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solar Distributor & Retailer Management Portal</title>
+    <meta name="description" content="Professional, modern Solar Distributor and Retailer Network Management Application for solar equipment companies.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- CSS Design System -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/tables.css">
+    <link rel="stylesheet" href="css/agreement.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-brand-logo">☀️</div>
+                <div class="sidebar-brand-text"><span>Solaria</span> Hub</div>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li class="menu-label">Main Console</li>
+                <li class="sidebar-item">
+                    <a href="#dashboard" class="sidebar-link active" id="nav-dashboard">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+
+                <li class="menu-label">Network Modules</li>
+                <li class="sidebar-item">
+                    <a href="#distributors" class="sidebar-link" id="nav-distributors">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                        <span>Distributors</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="#retailers" class="sidebar-link" id="nav-retailers">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+                        <span>Retail Partners</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="#agreement" class="sidebar-link" id="nav-agreement">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        <span>Agreement Generator</span>
+                    </a>
+                </li>
+
+                <li class="menu-label">System & Reports</li>
+                <li class="sidebar-item">
+                    <a href="#reports" class="sidebar-link" id="nav-reports">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                        <span>Reports</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="#settings" class="sidebar-link" id="nav-settings">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        <span>Settings</span>
+                    </a>
+                </li>
+                <li class="sidebar-item" style="margin-top: 16px;">
+                    <a href="#login" class="sidebar-link" id="nav-logout-btn" style="color: #fca5a5;">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                        <span>Logout</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <div class="user-profile-badge">
+                    <div class="user-avatar">AD</div>
+                    <div class="user-info">
+                        <div class="user-name" id="user-profile-name">Solar Admin</div>
+                        <div class="user-role" id="user-profile-role">System Director</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Workspace Area -->
+        <div class="main-wrapper">
+            <!-- Top Navbar -->
+            <header class="topbar" id="topbar">
+                <div class="topbar-left">
+                    <button class="sidebar-toggle-btn" id="sidebar-toggle" title="Toggle Navigation Sidebar">
+                        <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                    </button>
+                    <div class="page-breadcrumb" id="page-title-breadcrumb">Dashboard Overview</div>
+                </div>
+
+                <div class="topbar-right">
+                    <span class="badge badge-active" style="padding: 6px 12px; font-size: 13px;">⚡ LocalStorage Mode Active</span>
+                </div>
+            </header>
+
+            <!-- Dynamic View Container -->
+            <main class="content-body" id="main-content-view">
+                <!-- Pages render dynamically here -->
+            </main>
+        </div>
+    </div>
+
+    <!-- Main ES6 JavaScript Entry -->
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>
