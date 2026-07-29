@@ -46,20 +46,23 @@ export const LoginPage = {
             </div>
         `;
 
-        document.getElementById('login-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const u = document.getElementById('username').value.trim();
-            const p = document.getElementById('password').value.trim();
+        const form = container.querySelector('#login-form');
+        if (form) {
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const u = container.querySelector('#username').value.trim();
+                const p = container.querySelector('#password').value.trim();
 
-            try {
-                const res = await AuthService.login(u, p);
-                if (res.success) {
-                    Toast.success('Login successful! Welcome back.');
-                    window.location.hash = '#dashboard';
+                try {
+                    const res = await AuthService.login(u, p);
+                    if (res.success) {
+                        Toast.success('Login successful! Welcome back.');
+                        window.location.hash = '#dashboard';
+                    }
+                } catch (err) {
+                    Toast.error(err.message || 'Authentication failed');
                 }
-            } catch (err) {
-                Toast.error(err.message || 'Authentication failed');
-            }
-        });
+            });
+        }
     }
 };

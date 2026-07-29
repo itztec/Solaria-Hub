@@ -72,20 +72,24 @@ class AppRouter {
             return;
         }
 
-        const appContainer = document.getElementById('app');
-        const sidebar = document.getElementById('sidebar');
-        const topbar = document.getElementById('topbar');
+        const loginView = document.getElementById('login-view');
+        const appShell = document.getElementById('app-shell');
         const mainContent = document.getElementById('main-content-view');
 
         if (routeKey === '#login') {
-            if (sidebar) sidebar.style.display = 'none';
-            if (topbar) topbar.style.display = 'none';
-            if (mainContent) mainContent.style.padding = '0';
-            LoginPage.render(appContainer);
+            if (appShell) appShell.style.display = 'none';
+            if (loginView) {
+                loginView.style.display = 'block';
+                LoginPage.render(loginView);
+            }
             return;
         }
 
-        // Ensure App Shell Layout is visible
+        // Show main app workspace shell & hide login view
+        if (loginView) loginView.style.display = 'none';
+        if (appShell) appShell.style.display = 'flex';
+
+        // Update user details in sidebar
         this.ensureShellLayout();
 
         // Update active sidebar links
@@ -94,20 +98,14 @@ class AppRouter {
         // Update page title & breadcrumbs
         this.updateHeaderBreadcrumb(routeKey);
 
-        // Render Page View
+        // Render Page View inside main content area
         const pageController = this.routes[routeKey] || DashboardPage;
-        await pageController.render(document.getElementById('main-content-view'));
+        if (mainContent) {
+            await pageController.render(mainContent);
+        }
     }
 
     ensureShellLayout() {
-        const sidebar = document.getElementById('sidebar');
-        const topbar = document.getElementById('topbar');
-        const mainContent = document.getElementById('main-content-view');
-
-        if (sidebar) sidebar.style.display = 'flex';
-        if (topbar) topbar.style.display = 'flex';
-        if (mainContent) mainContent.style.padding = '28px';
-
         // Set user profile info in sidebar
         const user = AuthService.getCurrentUser();
         if (user) {
