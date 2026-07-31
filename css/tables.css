@@ -439,9 +439,212 @@
         gap: 4px;
     }
 
-    .btn-action {
-        width: 32px;
-        height: 32px;
+    .cust-card-actions {
+        grid-template-columns: 1fr;
+        gap: 8px;
     }
 }
+
+/* ==========================================================================
+   CUSTOMER CARD LIST VIEW STYLES (GLOBAL)
+   ========================================================================== */
+
+.customer-card-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 10px;
+}
+
+.customer-card {
+    background: #ffffff;
+    border: 1px solid var(--slate-200);
+    border-radius: 12px;
+    padding: 18px 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    transition: all var(--transition-fast);
+}
+
+.customer-card:hover {
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+    border-color: var(--primary-300);
+}
+
+.cust-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.cust-name {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--slate-900);
+    margin: 0 0 6px 0;
+}
+
+.cust-contact {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13.5px;
+    color: var(--slate-600);
+    font-weight: 600;
+}
+
+.whatsapp-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: #dcfce7;
+    color: #16a34a;
+    text-decoration: none;
+    font-size: 12px;
+    transition: transform 0.2s;
+}
+
+.whatsapp-link:hover {
+    transform: scale(1.15);
+}
+
+.cust-location {
+    font-size: 13px;
+    color: var(--slate-500);
+    margin-top: 4px;
+    font-weight: 500;
+}
+
+.cust-card-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+}
+
+.badge-green-pill {
+    background-color: #22c55e;
+    color: #ffffff;
+    padding: 3px 12px;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 12px;
+    display: inline-block;
+}
+
+.badge-amber-pill {
+    background-color: #f59e0b;
+    color: #ffffff;
+    padding: 3px 12px;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 12px;
+    display: inline-block;
+}
+
+.cust-date {
+    font-size: 12px;
+    color: var(--slate-400);
+    font-weight: 500;
+    margin-top: 2px;
+}
+
+/* System Banner Strip */
+.cust-system-banner {
+    background-color: #f3e8ff;
+    border-radius: 8px;
+    padding: 9px 16px;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #7e22ce;
+    margin: 14px 0 12px 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Tags Row */
+.cust-tags-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.cust-tag {
+    background-color: #ffffff;
+    border: 1px solid var(--slate-200);
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--slate-700);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.cust-tag.tag-loan-yes {
+    background-color: #f0fdf4;
+    border-color: #bbf7d0;
+    color: #15803d;
+}
+
+/* Equal Width Action Buttons */
+.cust-card-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    padding-top: 4px;
+}
+
+.btn-cust-action {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 9px 12px;
+    font-weight: 600;
+    font-size: 13.5px;
+    cursor: pointer;
+    text-align: center;
+    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.2s;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.btn-cust-action.btn-save-gps {
+    border: 1px solid #f87171;
+    color: #ef4444;
+}
+
+.btn-cust-action.btn-save-gps:hover {
+    background-color: #fef2f2;
+}
+
+.btn-cust-action.btn-upload-doc {
+    border: 1px solid #60a5fa;
+    color: #3b82f6;
+}
+
+.btn-cust-action.btn-upload-doc:hover {
+    background-color: #eff6ff;
+}
+
+.btn-cust-action.btn-edit-cust {
+    border: 1px solid #4ade80;
+    color: #16a34a;
+}
+
+.btn-cust-action.btn-edit-cust:hover {
+    background-color: #f0fdf4;
+}
+
 

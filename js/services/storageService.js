@@ -7,7 +7,7 @@
 const STORAGE_KEYS = {
     AUTH_USER: 'solar_auth_user',
     DISTRIBUTORS: 'solar_distributors',
-    RETAILERS: 'solar_retailers',
+    CUSTOMERS: 'solar_customers',
     SETTINGS: 'solar_settings'
 };
 
@@ -32,6 +32,7 @@ const DEFAULT_DISTRIBUTORS = [
         phone: '9823011223',
         altPhone: '9823011299',
         email: 'rajesh@greengrid.in',
+        password: 'password123',
         state: 'Maharashtra',
         district: 'Pune',
         area: 'Hinjewadi',
@@ -50,6 +51,7 @@ const DEFAULT_DISTRIBUTORS = [
         phone: '9711099887',
         altPhone: '9711099800',
         email: 'anita@sunpower.com',
+        password: 'password123',
         state: 'Karnataka',
         district: 'Bengaluru Urban',
         area: 'Whitefield',
@@ -68,6 +70,7 @@ const DEFAULT_DISTRIBUTORS = [
         phone: '9440122334',
         altPhone: '',
         email: 'vrao@suryainfra.com',
+        password: 'password123',
         state: 'Telangana',
         district: 'Hyderabad',
         area: 'Gachibowli',
@@ -86,6 +89,7 @@ const DEFAULT_DISTRIBUTORS = [
         phone: '9810055443',
         altPhone: '9810055444',
         email: 'vikram@ecoray.in',
+        password: 'password123',
         state: 'Delhi',
         district: 'South Delhi',
         area: 'Okhla Phase 3',
@@ -99,66 +103,94 @@ const DEFAULT_DISTRIBUTORS = [
     }
 ];
 
-const DEFAULT_RETAILERS = [
+const DEFAULT_CUSTOMERS = [
     {
-        id: 'RET-2026-001',
-        retailerName: 'Suresh Patel',
-        shopName: 'Patel Solar & Electrical Hardware',
+        id: 'CUST-2026-001',
+        customerName: 'Aarav Mehta',
         phone: '9920199201',
-        email: 'patelsolar@gmail.com',
-        distributorId: 'DIS-2026-001',
-        state: 'Maharashtra',
+        email: 'aarav.m@gmail.com',
+        address: 'Flat 402, Green Avenue, Wakad, Pune',
+        pincode: '411057',
+        city: 'Pune',
         district: 'Pune',
-        area: 'Wakad',
-        address: 'Shop 4, Datta Mandir Road, Wakad, Pune',
-        status: 'Active',
-        photo: '',
-        notes: 'Top performing retail shop for residential rooftop kits.'
+        state: 'Maharashtra',
+        systemSize: '4kw solar system',
+        leadSource: 'Website Inquiry',
+        caNumber: 'CA-98213871',
+        sanctionLoad: '5 kW',
+        bankLoan: 'No',
+        projectCost: '220000',
+        discomName: 'MSEDCL',
+        connectionType: 'Single Phase',
+        distributorId: 'DIS-2026-001',
+        distributorName: 'GreenGrid Solar Tech',
+        status: 'Active'
     },
     {
-        id: 'RET-2026-002',
-        retailerName: 'Manoj Kumar',
-        shopName: 'Manoj Green Energy Store',
+        id: 'CUST-2026-002',
+        customerName: 'Priya Sundaram',
         phone: '9845012345',
-        email: 'manojgreen@outlook.com',
-        distributorId: 'DIS-2026-002',
+        email: 'priya.sun@outlook.com',
+        address: 'Villa 18, Palm Meadows, Marathahalli',
+        pincode: '560037',
+        city: 'Bengaluru',
+        district: 'Bengaluru',
         state: 'Karnataka',
-        district: 'Bengaluru Urban',
-        area: 'Marathahalli',
-        address: 'Main Outer Ring Road, Marathahalli, Bengaluru',
-        status: 'Active',
-        photo: '',
-        notes: 'Specializes in solar battery storage units.'
+        systemSize: '3kw solar system',
+        leadSource: 'Referral',
+        caNumber: 'CA-44210988',
+        sanctionLoad: '4 kW',
+        bankLoan: 'Yes',
+        projectCost: '175000',
+        discomName: 'BESCOM',
+        connectionType: 'Single Phase',
+        distributorId: 'DIS-2026-002',
+        distributorName: 'SunPower Enterprises',
+        status: 'Active'
     },
     {
-        id: 'RET-2026-003',
-        retailerName: 'Prakash Naidu',
-        shopName: 'Surya Power Mart',
+        id: 'CUST-2026-003',
+        customerName: 'Ramesh Reddy',
         phone: '9440987654',
-        email: 'prakash@suryamart.in',
-        distributorId: 'DIS-2026-003',
-        state: 'Telangana',
+        email: 'ramesh.reddy@yahoo.com',
+        address: 'Plot 88, KPHB Colony, Kukatpally',
+        pincode: '500072',
+        city: 'Hyderabad',
         district: 'Hyderabad',
-        area: 'Kukatpally',
-        address: 'Opp. Metro Pillar 12, Kukatpally, Hyderabad',
-        status: 'Active',
-        photo: '',
-        notes: 'Retail partner for agricultural solar pumps.'
+        state: 'Telangana',
+        systemSize: '7.5 HP Solar Pump',
+        leadSource: 'Exhibition',
+        caNumber: 'CA-10928374',
+        sanctionLoad: '8 kW',
+        bankLoan: 'Yes',
+        projectCost: '350000',
+        discomName: 'TSSPDCL',
+        connectionType: 'Three Phase',
+        distributorId: 'DIS-2026-003',
+        distributorName: 'Surya Infra & Electricals',
+        status: 'Active'
     },
     {
-        id: 'RET-2026-004',
-        retailerName: 'Amit Verma',
-        shopName: 'Verma Electricals & Solar',
+        id: 'CUST-2026-004',
+        customerName: 'Sanjay Verma',
         phone: '9811122334',
-        email: 'vermaelec@yahoo.com',
-        distributorId: 'DIS-2026-004',
+        email: 'sanjay.verma@gmail.com',
+        address: 'H.No 45, Lajpat Nagar 2, New Delhi',
+        pincode: '110024',
+        city: 'Delhi',
+        district: 'Delhi',
         state: 'Delhi',
-        district: 'South Delhi',
-        area: 'Lajpat Nagar',
-        address: 'Central Market, Lajpat Nagar 2, Delhi',
-        status: 'Pending',
-        photo: '',
-        notes: 'New retail onboarding.'
+        systemSize: '5kw solar system',
+        leadSource: 'Social Media',
+        caNumber: 'CA-55610293',
+        sanctionLoad: '6 kW',
+        bankLoan: 'No',
+        projectCost: '265000',
+        discomName: 'BSES Rajdhani',
+        connectionType: 'Three Phase',
+        distributorId: 'DIS-2026-004',
+        distributorName: 'EcoRay Energy Ltd',
+        status: 'Pending'
     }
 ];
 
@@ -170,8 +202,8 @@ export const StorageService = {
         if (!localStorage.getItem(STORAGE_KEYS.DISTRIBUTORS)) {
             localStorage.setItem(STORAGE_KEYS.DISTRIBUTORS, JSON.stringify(DEFAULT_DISTRIBUTORS));
         }
-        if (!localStorage.getItem(STORAGE_KEYS.RETAILERS)) {
-            localStorage.setItem(STORAGE_KEYS.RETAILERS, JSON.stringify(DEFAULT_RETAILERS));
+        if (!localStorage.getItem(STORAGE_KEYS.CUSTOMERS)) {
+            localStorage.setItem(STORAGE_KEYS.CUSTOMERS, JSON.stringify(DEFAULT_CUSTOMERS));
         }
     },
 
@@ -204,3 +236,4 @@ export const StorageService = {
 
 // Initialize seed data on load
 StorageService.init();
+

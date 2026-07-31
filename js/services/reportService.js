@@ -4,17 +4,26 @@
  */
 
 import { DistributorService } from './distributorService.js';
-import { RetailerService } from './retailerService.js';
+import { CustomerService } from './customerService.js';
+import { AuthService } from './authService.js';
 
 export const ReportService = {
     async getSummaryMetrics() {
-        const distributors = await DistributorService.getAll();
-        const retailers = await RetailerService.getAll();
+        const currentUser = AuthService.getCurrentUser();
+        const isDistributor = AuthService.isDistributor();
+
+        let distributors = await DistributorService.getAll();
+        let customers = await CustomerService.getAll();
+
+        if (isDistributor && currentUser && currentUser.distributorId) {
+            customers = customers.filter(c => c.distributorId === currentUser.distributorId);
+            distributors = distributors.filter(d => d.id === currentUser.distributorId);
+        }
 
         const activeDistributors = distributors.filter(d => d.status === 'Active').length;
-        const activeRetailers = retailers.filter(r => r.status === 'Active').length;
+        const activeCustomers = customers.filter(c => c.status === 'Active').length;
         const pendingDistributors = distributors.filter(d => d.status === 'Pending').length;
-        const pendingRetailers = retailers.filter(r => r.status === 'Pending').length;
+        const pendingCustomers = customers.filter(c => c.status === 'Pending').length;
 
         // Group Distributors by State
         const stateBreakdown = {};
@@ -23,11 +32,11 @@ export const ReportService = {
             stateBreakdown[state] = (stateBreakdown[state] || 0) + 1;
         });
 
-        // Group Retailers by State
-        const retailerStateBreakdown = {};
-        retailers.forEach(r => {
-            const state = r.state || 'Unspecified';
-            retailerStateBreakdown[state] = (retailerStateBreakdown[state] || 0) + 1;
+        // Group Customers by State
+        const customerStateBreakdown = {};
+        customers.forEach(c => {
+            const state = c.state || 'Unspecified';
+            customerStateBreakdown[state] = (customerStateBreakdown[state] || 0) + 1;
         });
 
         return {
@@ -36,16 +45,16 @@ export const ReportService = {
             pendingDistributors,
             inactiveDistributors: distributors.length - activeDistributors - pendingDistributors,
 
-            totalRetailers: retailers.length,
-            activeRetailers,
-            pendingRetailers,
-            inactiveRetailers: retailers.length - activeRetailers - pendingRetailers,
+            totalCustomers: customers.length,
+            activeCustomers,
+            pendingCustomers,
+            inactiveCustomers: customers.length - activeCustomers - pendingCustomers,
 
             distributorStateBreakdown: stateBreakdown,
-            retailerStateBreakdown,
+            customerStateBreakdown,
 
             recentDistributors: distributors.slice(0, 5),
-            recentRetailers: retailers.slice(0, 5)
+            recentCustomers: customers.slice(0, 5)
         };
     }
 };

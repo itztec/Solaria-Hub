@@ -5,14 +5,12 @@
  */
 
 import { AuthService } from './services/authService.js';
-import { SettingsService } from './services/settingsService.js';
+import { StorageService } from './services/storageService.js';
 import { LoginPage } from './pages/login.js';
 import { DashboardPage } from './pages/dashboard.js';
 import { DistributorPage } from './pages/distributors.js';
-import { RetailerPage } from './pages/retailers.js';
-import { AgreementPage } from './pages/agreement.js';
+import { CustomerPage } from './pages/customers.js';
 import { ReportsPage } from './pages/reports.js';
-import { SettingsPage } from './pages/settings.js';
 
 class AppRouter {
     constructor() {
@@ -20,10 +18,11 @@ class AppRouter {
             '#login': LoginPage,
             '#dashboard': DashboardPage,
             '#distributors': DistributorPage,
-            '#retailers': RetailerPage,
-            '#agreement': AgreementPage,
-            '#reports': ReportsPage,
-            '#settings': SettingsPage
+            '#customers': CustomerPage,
+            '#customer-add': CustomerPage,
+            '#customer-edit': CustomerPage,
+            '#customer-docs': CustomerPage,
+            '#reports': ReportsPage
         };
 
         this.init();
@@ -67,7 +66,7 @@ class AppRouter {
             backdrop.addEventListener('click', () => this.closeMobileSidebar());
         }
 
-        // Event delegation for sidebar links (works even if DOM dynamically updates)
+        // Event delegation for sidebar links
         document.addEventListener('click', (e) => {
             const link = e.target.closest('.sidebar-link');
             if (link && window.innerWidth <= 768) {
@@ -90,7 +89,7 @@ class AppRouter {
         this.closeMobileSidebar();
 
         let hash = window.location.hash || '#dashboard';
-        const routeKey = hash.split('?')[0];
+        let routeKey = hash.split('?')[0];
 
         // Auth guard
         const isAuthenticated = AuthService.isAuthenticated();
@@ -102,6 +101,12 @@ class AppRouter {
 
         if (isAuthenticated && routeKey === '#login') {
             window.location.hash = '#dashboard';
+            return;
+        }
+
+        // Role guard: Distributor cannot access Distributors management
+        if (isAuthenticated && AuthService.isDistributor() && routeKey === '#distributors') {
+            window.location.hash = '#customers';
             return;
         }
 
@@ -122,30 +127,71 @@ class AppRouter {
         if (loginView) loginView.style.display = 'none';
         if (appShell) appShell.style.display = 'flex';
 
-        // Update user details in sidebar
-        this.ensureShellLayout();
+        try {
+            // Update user details & role-based sidebar visibility
+            this.ensureShellLayout();
 
-        // Update active sidebar links
-        this.updateSidebarActive(routeKey);
+            // Update active sidebar links
+            this.updateSidebarActive(routeKey);
 
-        // Update page title & breadcrumbs
-        this.updateHeaderBreadcrumb(routeKey);
+            // Update page title & breadcrumbs
+            this.updateHeaderBreadcrumb(routeKey);
 
-        // Render Page View inside main content area
-        const pageController = this.routes[routeKey] || DashboardPage;
-        if (mainContent) {
-            await pageController.render(mainContent);
+            // Render Page View inside main content area
+            const pageController = this.routes[routeKey] || DashboardPage;
+            if (mainContent) {
+                await pageController.render(mainContent);
+            }
+        } catch (err) {
+            console.error('Error rendering page view:', err);
+            if (mainContent) {
+                mainContent.innerHTML = `
+                    <div class="card" style="padding: 32px; text-align: center;">
+                        <h3 style="color: #dc2626; margin-bottom: 8px;">⚠️ View Loading Error</h3>
+                        <p style="color: var(--slate-600); font-size: 14px;">An error occurred while loading this view: ${err.message || err}</p>
+                        <button class="btn btn-primary" style="margin-top: 16px;" onclick="window.location.hash='#dashboard'">Return to Dashboard</button>
+                    </div>
+                `;
+            }
         }
     }
 
     ensureShellLayout() {
-        // Set user profile info in sidebar
         const user = AuthService.getCurrentUser();
         if (user) {
             const nameEl = document.getElementById('user-profile-name');
             const roleEl = document.getElementById('user-profile-role');
-            if (nameEl) nameEl.textContent = user.name || 'Solar Administrator';
-            if (roleEl) roleEl.textContent = user.role || 'Administrator';
+            const avatarEl = document.querySelector('.user-avatar');
+
+            if (user.role === 'Distributor') {
+                const distList = StorageService.get(StorageService.KEYS.DISTRIBUTORS) || [];
+                const targetId = user.distributorId || user.username;
+                const found = distList.find(d => 
+                    d.id.toLowerCase() === (targetId || '').toLowerCase() ||
+                    d.id.toLowerCase() === (user.username || '').toLowerCase()
+                );
+
+                const distName = found ? found.companyName : (user.name && !user.name.startsWith('DIS-') ? user.name : 'GreenGrid Solar Tech');
+                const distId = found ? found.id : (user.distributorId || 'DIS-2026-001');
+
+                if (nameEl) nameEl.textContent = distName;
+                if (roleEl) roleEl.textContent = `Distributor • ${distId}`;
+                if (avatarEl) avatarEl.textContent = distName.substring(0, 2).toUpperCase();
+            } else {
+                if (nameEl) nameEl.textContent = user.name || 'Channel Partner Admin';
+                if (roleEl) roleEl.textContent = 'Channel Partner Console';
+                if (avatarEl) avatarEl.textContent = 'CP';
+            }
+        }
+
+        // Hide/Show Distributors link depending on role
+        const disNavItem = document.getElementById('nav-item-distributors');
+        if (disNavItem) {
+            if (AuthService.isDistributor()) {
+                disNavItem.style.display = 'none';
+            } else {
+                disNavItem.style.display = 'block';
+            }
         }
     }
 
@@ -163,11 +209,12 @@ class AppRouter {
     updateHeaderBreadcrumb(routeKey) {
         const titles = {
             '#dashboard': 'Dashboard Overview',
-            '#distributors': 'Solar Distributors Management',
-            '#retailers': 'Retail Partners Directory',
-            '#agreement': 'Legal Agreement Generator',
-            '#reports': 'Reports & System Analytics',
-            '#settings': 'Organization Settings'
+            '#distributors': 'Solar Distributors Directory',
+            '#customers': 'Customer Registrations',
+            '#customer-add': 'Register New Customer',
+            '#customer-edit': 'Edit Customer Details',
+            '#customer-docs': 'Customer Documents',
+            '#reports': 'Reports & System Analytics'
         };
 
         const breadcrumbEl = document.getElementById('page-title-breadcrumb');

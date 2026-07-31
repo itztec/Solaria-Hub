@@ -4,7 +4,7 @@
  */
 
 import { DistributorService } from '../services/distributorService.js';
-import { RetailerService } from '../services/retailerService.js';
+import { CustomerService } from '../services/customerService.js';
 import { Modal } from '../components/modal.js';
 import { Toast } from '../components/toast.js';
 import { SweetAlert } from '../components/alert.js';
@@ -115,11 +115,8 @@ export const DistributorPage = {
                                     </td>
                                     <td>
                                         <div class="action-buttons" style="justify-content: flex-end;">
-                                            <button class="btn-action btn-view-dis" data-id="${d.id}" title="View Profile">
+                                            <button class="btn-action btn-view-dis" data-id="${d.id}" title="View Profile & Customers">
                                                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                            </button>
-                                            <button class="btn-action btn-agree-dis" data-id="${d.id}" title="Generate Agreement" style="color: var(--primary-600);">
-                                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                                             </button>
                                             <button class="btn-action btn-edit-dis" data-id="${d.id}" title="Edit Record">
                                                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
@@ -175,13 +172,6 @@ export const DistributorPage = {
             btn.addEventListener('click', (e) => {
                 const id = e.currentTarget.dataset.id;
                 this.openProfileModal(id);
-            });
-        });
-
-        container.querySelectorAll('.btn-agree-dis').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const id = e.currentTarget.dataset.id;
-                window.location.hash = `#agreement?distributorId=${id}`;
             });
         });
 
@@ -432,13 +422,12 @@ export const DistributorPage = {
                         pdfDoc: pdfBase64,
                         notes: modalEl.querySelector('#dis-notes').value.trim()
                     };
-
                     if (isEdit) {
                         await DistributorService.update(distributor.id, payload);
                         Toast.success(`Distributor ${distributor.id} updated successfully!`);
                     } else {
-                        await DistributorService.create(payload);
-                        Toast.success('New distributor created successfully!');
+                        const res = await DistributorService.create(payload);
+                        Toast.success(`Distributor Registered! ID: ${res.distributor.id} | Password: ${res.distributor.password}`);
                     }
 
                     Modal.close();
@@ -455,20 +444,36 @@ export const DistributorPage = {
 
     async openProfileModal(id) {
         const distributor = await DistributorService.getById(id);
-        const linkedRetailers = await RetailerService.getByDistributor(id);
+        const linkedCustomers = await CustomerService.getByDistributor(id);
 
         const profileHtml = `
             <div class="profile-header-card">
-                <img src="${distributor.photo || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="%2394a3b8" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>'}" class="profile-avatar-xl" />
+                ${distributor.photo ? `<img src="${distributor.photo}" class="profile-avatar-xl" />` : `<div class="profile-avatar-xl" style="background: rgba(255,255,255,0.2); color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 700; border-radius: 12px; min-width: 64px; height: 64px; border: 2px solid rgba(255,255,255,0.3);">${distributor.companyName ? distributor.companyName.substring(0, 2).toUpperCase() : 'DS'}</div>`}
                 <div class="profile-title-area" style="flex:1;">
-                    <h2>${distributor.companyName}</h2>
-                    <p style="color: var(--slate-300); font-size: 14px;">Distributor Name: <strong>${distributor.distributorName}</strong></p>
-                    <div class="profile-meta-pills">
+                    <h2 style="margin: 0; font-size: 20px;">${distributor.companyName}</h2>
+                    <p style="color: rgba(255,255,255,0.85); font-size: 13.5px; margin-top: 4px;">Distributor Representative: <strong>${distributor.distributorName}</strong></p>
+                    <div class="profile-meta-pills" style="margin-top: 8px;">
                         <span class="meta-pill">🆔 ${distributor.id}</span>
                         <span class="meta-pill">📍 ${distributor.area || ''}, ${distributor.district || ''}</span>
                         <span class="badge badge-${distributor.status ? distributor.status.toLowerCase() : 'active'}">
                             <span class="badge-dot"></span>${distributor.status || 'Active'}
                         </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="margin-bottom: 20px; padding: 16px; background: linear-gradient(135deg, #eff6ff, #f0fdf4); border: 1px solid #bfdbfe;">
+                <h4 style="color: var(--primary-700); margin-bottom: 10px; font-size: 14px; display: flex; align-items: center; gap: 6px;">
+                    <span>🔐 Login Credentials (Auto-Generated)</span>
+                </h4>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div style="background: #ffffff; padding: 10px 14px; border-radius: 6px; border: 1px solid #dbeafe;">
+                        <strong style="color: var(--slate-500); font-size: 11px; display: block; margin-bottom: 2px; text-transform: uppercase;">Distributor ID / Username</strong>
+                        <span style="font-family: monospace; font-size: 15px; font-weight: 700; color: #1d4ed8;">${distributor.id}</span>
+                    </div>
+                    <div style="background: #ffffff; padding: 10px 14px; border-radius: 6px; border: 1px solid #dbeafe;">
+                        <strong style="color: var(--slate-500); font-size: 11px; display: block; margin-bottom: 2px; text-transform: uppercase;">Password</strong>
+                        <span style="font-family: monospace; font-size: 15px; font-weight: 700; color: #15803d;">${distributor.password || 'password123'}</span>
                     </div>
                 </div>
             </div>
@@ -482,12 +487,10 @@ export const DistributorPage = {
                 </div>
 
                 <div class="card" style="padding: 16px;">
-                    <h4 style="color: var(--primary-700); margin-bottom: 8px; font-size: 14px;">🏠 Location & Agreement</h4>
+                    <h4 style="color: var(--primary-700); margin-bottom: 8px; font-size: 14px;">🏠 Location & Details</h4>
                     <p style="font-size: 13px;"><strong>State:</strong> ${distributor.state || '-'}</p>
                     <p style="font-size: 13px;"><strong>Pincode:</strong> ${distributor.pincode || '-'}</p>
-                    <p style="font-size: 13px;"><strong>Agreement Start:</strong> ${distributor.agreementDate || '-'}</p>
-                    <p style="font-size: 13px;"><strong>Duration:</strong> ${distributor.agreementDuration ? distributor.agreementDuration + ' Year' + (parseInt(distributor.agreementDuration) > 1 ? 's' : '') : '-'}</p>
-                    <p style="font-size: 13px;"><strong>Agreement End:</strong> <span style="color: var(--primary-700); font-weight: 700;">${distributor.agreementEndDate || '-'}</span></p>
+                    <p style="font-size: 13px;"><strong>Registration Date:</strong> ${distributor.agreementDate || '-'}</p>
                 </div>
             </div>
 
@@ -497,10 +500,29 @@ export const DistributorPage = {
             </div>
 
             <div class="card" style="margin-bottom: 20px; padding: 16px;">
-                <h4 style="color: var(--primary-700); margin-bottom: 10px; font-size: 14px;">🛍️ Linked Retail Shops (${linkedRetailers.length})</h4>
-                ${linkedRetailers.length === 0 ? '<p style="font-size: 12.5px; color: var(--slate-500);">No retailers currently linked to this distributor.</p>' : `
-                    <div style="display:flex; flex-wrap:wrap; gap:8px;">
-                        ${linkedRetailers.map(r => `<span class="badge badge-active" style="font-size:12px;">🏪 ${r.shopName} (${r.retailerName})</span>`).join('')}
+                <h4 style="color: var(--primary-700); margin-bottom: 10px; font-size: 14px;">👥 Customer Registrations under this Distributor (${linkedCustomers.length})</h4>
+                ${linkedCustomers.length === 0 ? '<p style="font-size: 12.5px; color: var(--slate-500);">No customer registrations linked to this distributor yet.</p>' : `
+                    <div class="table-responsive" style="margin-top: 8px;">
+                        <table class="data-table" style="font-size: 12.5px;">
+                            <thead>
+                                <tr>
+                                    <th>Customer Name</th>
+                                    <th>Phone</th>
+                                    <th>System Capacity</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${linkedCustomers.map(c => `
+                                    <tr>
+                                        <td><strong>${c.customerName}</strong></td>
+                                        <td>${c.phone}</td>
+                                        <td><span class="badge badge-info">${c.systemSize || '-'}</span></td>
+                                        <td><span class="badge badge-${c.status ? c.status.toLowerCase() : 'active'}">${c.status || 'Active'}</span></td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
                     </div>
                 `}
             </div>
@@ -513,9 +535,9 @@ export const DistributorPage = {
             ` : ''}
 
             <div style="display:flex; justify-content: space-between; align-items:center; margin-top:20px;">
-                <button class="btn btn-secondary" onclick="Modal.close()">Close Profile</button>
-                <button class="btn btn-primary" onclick="Modal.close(); window.location.hash='#agreement?distributorId=${distributor.id}'">
-                    📄 Generate Agreement Document
+                <button type="button" class="btn btn-secondary" onclick="window.Modal.close()">Close Profile</button>
+                <button type="button" class="btn btn-primary" onclick="window.Modal.close(); window.location.hash='#customers';">
+                    View Customer Registrations
                 </button>
             </div>
         `;

@@ -1,51 +1,51 @@
 /**
- * DISTRIBUTOR SERVICE
- * Handles CRUD operations for Solar Distributors with Promise-based async interfaces
- * to enable seamless drop-in PHP/MySQL API replacement later.
+ * CUSTOMER SERVICE
+ * Handles CRUD operations for Customer Registrations under Distributors.
  */
 
 import { StorageService } from './storageService.js';
 
-export const DistributorService = {
+export const CustomerService = {
     async getAll() {
         return new Promise((resolve) => {
-            const list = StorageService.get(StorageService.KEYS.DISTRIBUTORS) || [];
+            const list = StorageService.get(StorageService.KEYS.CUSTOMERS) || [];
             resolve(list);
         });
     },
 
     async getById(id) {
         return new Promise((resolve, reject) => {
-            const list = StorageService.get(StorageService.KEYS.DISTRIBUTORS) || [];
-            const found = list.find(d => d.id === id);
+            const list = StorageService.get(StorageService.KEYS.CUSTOMERS) || [];
+            const found = list.find(c => c.id === id);
             if (found) {
                 resolve(found);
             } else {
-                reject({ message: 'Distributor not found' });
+                reject({ message: 'Customer not found' });
             }
         });
     },
 
-    generateAutoPassword() {
-        const randNum = Math.floor(1000 + Math.random() * 9000);
-        return `Pass@${randNum}`;
+    async getByDistributor(distributorId) {
+        return new Promise((resolve) => {
+            const list = StorageService.get(StorageService.KEYS.CUSTOMERS) || [];
+            const filtered = list.filter(c => c.distributorId === distributorId);
+            resolve(filtered);
+        });
     },
 
-    async create(distributorData) {
+    async create(customerData) {
         return new Promise((resolve, reject) => {
             try {
-                const list = StorageService.get(StorageService.KEYS.DISTRIBUTORS) || [];
+                const list = StorageService.get(StorageService.KEYS.CUSTOMERS) || [];
                 const newId = this.generateNextId(list);
-                const password = distributorData.password || this.generateAutoPassword();
-                const newDistributor = {
+                const newCustomer = {
                     id: newId,
-                    password: password,
-                    ...distributorData,
+                    ...customerData,
                     createdAt: new Date().toISOString()
                 };
-                list.unshift(newDistributor);
-                StorageService.set(StorageService.KEYS.DISTRIBUTORS, list);
-                resolve({ success: true, distributor: newDistributor });
+                list.unshift(newCustomer);
+                StorageService.set(StorageService.KEYS.CUSTOMERS, list);
+                resolve({ success: true, customer: newCustomer });
             } catch (err) {
                 reject({ success: false, message: err.message });
             }
@@ -55,14 +55,14 @@ export const DistributorService = {
     async update(id, updatedData) {
         return new Promise((resolve, reject) => {
             try {
-                const list = StorageService.get(StorageService.KEYS.DISTRIBUTORS) || [];
-                const index = list.findIndex(d => d.id === id);
+                const list = StorageService.get(StorageService.KEYS.CUSTOMERS) || [];
+                const index = list.findIndex(c => c.id === id);
                 if (index !== -1) {
                     list[index] = { ...list[index], ...updatedData, id: id };
-                    StorageService.set(StorageService.KEYS.DISTRIBUTORS, list);
-                    resolve({ success: true, distributor: list[index] });
+                    StorageService.set(StorageService.KEYS.CUSTOMERS, list);
+                    resolve({ success: true, customer: list[index] });
                 } else {
-                    reject({ success: false, message: 'Distributor not found for update' });
+                    reject({ success: false, message: 'Customer not found for update' });
                 }
             } catch (err) {
                 reject({ success: false, message: err.message });
@@ -73,14 +73,14 @@ export const DistributorService = {
     async delete(id) {
         return new Promise((resolve, reject) => {
             try {
-                let list = StorageService.get(StorageService.KEYS.DISTRIBUTORS) || [];
+                let list = StorageService.get(StorageService.KEYS.CUSTOMERS) || [];
                 const initialLength = list.length;
-                list = list.filter(d => d.id !== id);
+                list = list.filter(c => c.id !== id);
                 if (list.length < initialLength) {
-                    StorageService.set(StorageService.KEYS.DISTRIBUTORS, list);
+                    StorageService.set(StorageService.KEYS.CUSTOMERS, list);
                     resolve({ success: true });
                 } else {
-                    reject({ success: false, message: 'Distributor not found for deletion' });
+                    reject({ success: false, message: 'Customer not found for deletion' });
                 }
             } catch (err) {
                 reject({ success: false, message: err.message });
@@ -91,7 +91,7 @@ export const DistributorService = {
     generateNextId(list) {
         const year = new Date().getFullYear();
         if (!list || list.length === 0) {
-            return `DIS-${year}-001`;
+            return `CUST-${year}-001`;
         }
         const numericIds = list
             .map(item => {
@@ -99,9 +99,9 @@ export const DistributorService = {
                 return parts.length === 3 ? parseInt(parts[2], 10) : 0;
             })
             .filter(num => !isNaN(num));
-        
+
         const maxId = numericIds.length > 0 ? Math.max(...numericIds) : 0;
         const nextNum = (maxId + 1).toString().padStart(3, '0');
-        return `DIS-${year}-${nextNum}`;
+        return `CUST-${year}-${nextNum}`;
     }
 };

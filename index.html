@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solar Distributor & Retailer Management Portal</title>
-    <meta name="description" content="Professional, modern Solar Distributor and Retailer Network Management Application for solar equipment companies.">
+    <title>Solar Channel Partner & Distributor Portal</title>
+    <meta name="description" content="Professional, modern Solar Channel Partner and Distributor Management Portal for solar equipment network.">
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,7 +15,6 @@
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/dashboard.css">
     <link rel="stylesheet" href="css/tables.css">
-    <link rel="stylesheet" href="css/agreement.css">
 </head>
 <body>
     <div id="app">
@@ -25,14 +24,14 @@
         <!-- Main Workspace Shell (Sidebar + Topbar + Main Content View) -->
         <div id="app-shell" style="display: flex; width: 100%; min-height: 100vh;">
             <!-- Mobile Backdrop Overlay -->
-            <div class="sidebar-overlay-backdrop" id="sidebar-backdrop"></div>
+            <div class="sidebar-overlay-backdrop" id="sidebar-backdrop" onclick="document.getElementById('sidebar')?.classList.remove('mobile-open'); this.classList.remove('active');"></div>
 
             <!-- Sidebar Navigation -->
             <aside class="sidebar" id="sidebar">
                 <div class="sidebar-header">
                     <div class="sidebar-brand-logo">☀️</div>
                     <div class="sidebar-brand-text"><span>Solaria</span> Hub</div>
-                    <button class="mobile-close-sidebar-btn" id="mobile-close-sidebar-btn" title="Close Menu">&times;</button>
+                    <button class="mobile-close-sidebar-btn" id="mobile-close-sidebar-btn" title="Close Menu" onclick="document.getElementById('sidebar')?.classList.remove('mobile-open'); document.getElementById('sidebar-backdrop')?.classList.remove('active');">&times;</button>
                 </div>
 
                 <ul class="sidebar-menu">
@@ -45,22 +44,16 @@
                     </li>
 
                     <li class="menu-label">Network Modules</li>
-                    <li class="sidebar-item">
+                    <li class="sidebar-item" id="nav-item-distributors">
                         <a href="#distributors" class="sidebar-link" id="nav-distributors">
                             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
                             <span>Distributors</span>
                         </a>
                     </li>
-                    <li class="sidebar-item">
-                        <a href="#retailers" class="sidebar-link" id="nav-retailers">
-                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
-                            <span>Retail Partners</span>
-                        </a>
-                    </li>
-                    <li class="sidebar-item">
-                        <a href="#agreement" class="sidebar-link" id="nav-agreement">
-                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                            <span>Agreement Generator</span>
+                    <li class="sidebar-item" id="nav-item-customers">
+                        <a href="#customers" class="sidebar-link" id="nav-customers">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            <span>Customer Registrations</span>
                         </a>
                     </li>
 
@@ -69,12 +62,6 @@
                         <a href="#reports" class="sidebar-link" id="nav-reports">
                             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
                             <span>Reports</span>
-                        </a>
-                    </li>
-                    <li class="sidebar-item">
-                        <a href="#settings" class="sidebar-link" id="nav-settings">
-                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                            <span>Settings</span>
                         </a>
                     </li>
                     <li class="sidebar-item" style="margin-top: 16px;">
