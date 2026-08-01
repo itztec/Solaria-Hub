@@ -1,29 +1,29 @@
-/**
- * DISTRIBUTOR SERVICE
- * Handles CRUD operations for Solar Distributors with Promise-based async interfaces
- * to enable seamless drop-in PHP/MySQL API replacement later.
- */
-
 import { StorageService } from './storageService.js';
+import { ApiService } from './apiService.js';
 
 export const DistributorService = {
     async getAll() {
-        return new Promise((resolve) => {
-            const list = StorageService.get(StorageService.KEYS.DISTRIBUTORS) || [];
-            resolve(list);
-        });
+        if (ApiService.isServerAvailable()) {
+            const apiRes = await ApiService.get('distributors.php');
+            if (apiRes && apiRes.success && Array.isArray(apiRes.distributors)) {
+                StorageService.set(StorageService.KEYS.DISTRIBUTORS, apiRes.distributors);
+                return apiRes.distributors;
+            }
+        }
+        return StorageService.get(StorageService.KEYS.DISTRIBUTORS) || [];
     },
 
     async getById(id) {
-        return new Promise((resolve, reject) => {
-            const list = StorageService.get(StorageService.KEYS.DISTRIBUTORS) || [];
-            const found = list.find(d => d.id === id);
-            if (found) {
-                resolve(found);
-            } else {
-                reject({ message: 'Distributor not found' });
+        if (ApiService.isServerAvailable()) {
+            const apiRes = await ApiService.get('distributors.php', { id });
+            if (apiRes && apiRes.success && apiRes.distributor) {
+                return apiRes.distributor;
             }
-        });
+        }
+        const list = StorageService.get(StorageService.KEYS.DISTRIBUTORS) || [];
+        const found = list.find(d => d.id === id);
+        if (found) return found;
+        throw new Error('Distributor not found');
     },
 
     generateAutoPassword() {
@@ -32,60 +32,96 @@ export const DistributorService = {
     },
 
     async create(distributorData) {
-        return new Promise((resolve, reject) => {
-            try {
+        // Handle file upload if present
+        if (distributorData.photo && distributorData.photo.startsWith('data:')) {
+            const uploaded = await ApiService.uploadFile(distributorData.photo);
+            if (uploaded && uploaded.url) distributorData.photo = uploaded.url;
+        }
+        if (distributorData.pdfDoc && distributorData.pdfDoc.startsWith('data:')) {
+            const uploaded = await ApiService.uploadFile(distributorData.pdfDoc);
+            if (uploaded && uploaded.url) distributorData.pdfDoc = uploaded.url;
+        }
+
+        if (ApiService.isServerAvailable()) {
+            const apiRes = await ApiService.post('distributors.php', distributorData);
+            if (apiRes && apiRes.success && apiRes.distributor) {
                 const list = StorageService.get(StorageService.KEYS.DISTRIBUTORS) || [];
-                const newId = this.generateNextId(list);
-                const password = distributorData.password || this.generateAutoPassword();
-                const newDistributor = {
-                    id: newId,
-                    password: password,
-                    ...distributorData,
-                    createdAt: new Date().toISOString()
-                };
-                list.unshift(newDistributor);
+                list.unshift(apiRes.distributor);
                 StorageService.set(StorageService.KEYS.DISTRIBUTORS, list);
-                resolve({ success: true, distributor: newDistributor });
-            } catch (err) {
-                reject({ success: false, message: err.message });
+                return { success: true, distributor: apiRes.distributor };
             }
-        });
+        }
+
+        // LocalStorage fallback
+        const list = StorageService.get(StorageService.KEYS.DISTRIBUTORS) || [];
+        const newId = this.generateNextId(list);
+        const password = distributorData.password || this.generateAutoPassword();
+        const newDistributor = {
+            id: newId,
+            password: password,
+            ...distributorData,
+            createdAt: new Date().toISOString()
+        };
+        list.unshift(newDistributor);
+        StorageService.set(StorageService.KEYS.DISTRIBUTORS, list);
+        return { success: true, distributor: newDistributor };
     },
 
     async update(id, updatedData) {
-        return new Promise((resolve, reject) => {
-            try {
+        // Handle file upload if present
+        if (updatedData.photo && updatedData.photo.startsWith('data:')) {
+            const uploaded = await ApiService.uploadFile(updatedData.photo);
+            if (uploaded && uploaded.url) updatedData.photo = uploaded.url;
+        }
+        if (updatedData.pdfDoc && updatedData.pdfDoc.startsWith('data:')) {
+            const uploaded = await ApiService.uploadFile(updatedData.pdfDoc);
+            if (uploaded && uploaded.url) updatedData.pdfDoc = uploaded.url;
+        }
+
+        if (ApiService.isServerAvailable()) {
+            const apiRes = await ApiService.post('distributors.php', { _action: 'PUT', id, ...updatedData });
+            if (apiRes && apiRes.success && apiRes.distributor) {
                 const list = StorageService.get(StorageService.KEYS.DISTRIBUTORS) || [];
-                const index = list.findIndex(d => d.id === id);
-                if (index !== -1) {
-                    list[index] = { ...list[index], ...updatedData, id: id };
+                const idx = list.findIndex(d => d.id === id);
+                if (idx !== -1) {
+                    list[idx] = apiRes.distributor;
                     StorageService.set(StorageService.KEYS.DISTRIBUTORS, list);
-                    resolve({ success: true, distributor: list[index] });
-                } else {
-                    reject({ success: false, message: 'Distributor not found for update' });
                 }
-            } catch (err) {
-                reject({ success: false, message: err.message });
+                return { success: true, distributor: apiRes.distributor };
             }
-        });
+        }
+
+        // LocalStorage fallback
+        const list = StorageService.get(StorageService.KEYS.DISTRIBUTORS) || [];
+        const index = list.findIndex(d => d.id === id);
+        if (index !== -1) {
+            list[index] = { ...list[index], ...updatedData, id: id };
+            StorageService.set(StorageService.KEYS.DISTRIBUTORS, list);
+            return { success: true, distributor: list[index] };
+        }
+        throw new Error('Distributor not found for update');
     },
 
     async delete(id) {
-        return new Promise((resolve, reject) => {
-            try {
+        if (ApiService.isServerAvailable()) {
+            const apiRes = await ApiService.post('distributors.php', { _action: 'DELETE', id });
+            if (apiRes && apiRes.success) {
                 let list = StorageService.get(StorageService.KEYS.DISTRIBUTORS) || [];
-                const initialLength = list.length;
                 list = list.filter(d => d.id !== id);
-                if (list.length < initialLength) {
-                    StorageService.set(StorageService.KEYS.DISTRIBUTORS, list);
-                    resolve({ success: true });
-                } else {
-                    reject({ success: false, message: 'Distributor not found for deletion' });
-                }
-            } catch (err) {
-                reject({ success: false, message: err.message });
+                StorageService.set(StorageService.KEYS.DISTRIBUTORS, list);
+                return { success: true };
             }
-        });
+        }
+
+        // LocalStorage fallback
+        let list = StorageService.get(StorageService.KEYS.DISTRIBUTORS) || [];
+        const initialLength = list.length;
+        list = list.filter(d => d.id !== id);
+        if (list.length < initialLength) {
+            StorageService.set(StorageService.KEYS.DISTRIBUTORS, list);
+            return { success: true };
+        }
+        throw new Error('Distributor not found for deletion');
     },
 
     generateNextId(list) {

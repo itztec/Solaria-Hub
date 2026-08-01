@@ -8,20 +8,23 @@ const STORAGE_KEYS = {
     AUTH_USER: 'solar_auth_user',
     DISTRIBUTORS: 'solar_distributors',
     CUSTOMERS: 'solar_customers',
-    SETTINGS: 'solar_settings'
+    SETTINGS: 'solar_settings',
+    SYSTEM_CONFIG: 'solar_sys_config',
+    ADMIN_CREDS: 'solar_admin_creds'
 };
 
 // Initial Seed Data for Instant Demonstration
 const DEFAULT_SETTINGS = {
-    companyName: 'Solaria Energy Systems Pvt Ltd',
-    logo: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIiBmaWxsPSIjMDU5NjY5Ij48Y2lyY2xlIGN4PSI1MCIgY3k9IjUwIiByPSIzMCIvPjxnIHN0cm9rZT0iI2Y1OWUwYiIgc3Ryb2tlLXdpZHRoPSI2IiBzdHJva2UtbGluZWNhcD0icm91bmQiPjxsaW5lIHgxPSI1MCIgeTE9IjUiIHgyPSI1MCIgeTI9IjE1Ii8+PGxpbmUgeDE9IjUwIiB5MT0iODUiIHgyPSI1MCIgeTI9Ijk1Ii8+PGxpbmUgeDE9IjUiIHkxPSI1MCIgeDI9IjE1IiB5Mj0iNTAiLz48bGluZSB4MT0iODUiIHkxPSI1MCIgeDI9Ijk1IiB5Mj0iNTAiLz48bGluZSB4MT0iMTgiIHkxPSIxOCIgeDI9IjI1IiB5Mj0iMjUiLz48bGluZSB4MT0iNzUiIHkxPSI3NSIgeDI9IjgyIiB5Mj0iODIiLz48bGluZSB4MT0iODIiIHkxPSIxOCIgeDI9Ijc1IiB5Mj0iMjUiLz48bGluZSB4MT0iMjUiIHkxPSI3NSIgeDI9IjE4IiB5Mj0iODIiLz48L2c+PC9zdmc+',
+    companyName: 'ASM Money Shef Solar',
+    tagline: 'Smart Energy • Safe Future',
+    logo: 'assets/logo.jpg',
     address: 'Solar Innovation Tower, Tech Park Road, Sector 62',
     city: 'Noida',
     state: 'Uttar Pradesh',
     pincode: '201301',
     phone: '+91 98765 43210',
-    email: 'info@solariaenergy.com',
-    website: 'https://www.solariaenergy.com'
+    email: 'info@asmmoneyshefsolar.com',
+    website: 'https://www.asmmoneyshefsolar.com'
 };
 
 const DEFAULT_DISTRIBUTORS = [

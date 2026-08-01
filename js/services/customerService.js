@@ -1,91 +1,111 @@
-/**
- * CUSTOMER SERVICE
- * Handles CRUD operations for Customer Registrations under Distributors.
- */
-
 import { StorageService } from './storageService.js';
+import { ApiService } from './apiService.js';
 
 export const CustomerService = {
     async getAll() {
-        return new Promise((resolve) => {
-            const list = StorageService.get(StorageService.KEYS.CUSTOMERS) || [];
-            resolve(list);
-        });
+        if (ApiService.isServerAvailable()) {
+            const apiRes = await ApiService.get('customers.php');
+            if (apiRes && apiRes.success && Array.isArray(apiRes.customers)) {
+                StorageService.set(StorageService.KEYS.CUSTOMERS, apiRes.customers);
+                return apiRes.customers;
+            }
+        }
+        return StorageService.get(StorageService.KEYS.CUSTOMERS) || [];
     },
 
     async getById(id) {
-        return new Promise((resolve, reject) => {
-            const list = StorageService.get(StorageService.KEYS.CUSTOMERS) || [];
-            const found = list.find(c => c.id === id);
-            if (found) {
-                resolve(found);
-            } else {
-                reject({ message: 'Customer not found' });
+        if (ApiService.isServerAvailable()) {
+            const apiRes = await ApiService.get('customers.php', { id });
+            if (apiRes && apiRes.success && apiRes.customer) {
+                return apiRes.customer;
             }
-        });
+        }
+        const list = StorageService.get(StorageService.KEYS.CUSTOMERS) || [];
+        const found = list.find(c => c.id === id);
+        if (found) return found;
+        throw new Error('Customer not found');
     },
 
     async getByDistributor(distributorId) {
-        return new Promise((resolve) => {
-            const list = StorageService.get(StorageService.KEYS.CUSTOMERS) || [];
-            const filtered = list.filter(c => c.distributorId === distributorId);
-            resolve(filtered);
-        });
+        if (ApiService.isServerAvailable()) {
+            const apiRes = await ApiService.get('customers.php', { distributorId });
+            if (apiRes && apiRes.success && Array.isArray(apiRes.customers)) {
+                return apiRes.customers;
+            }
+        }
+        const list = StorageService.get(StorageService.KEYS.CUSTOMERS) || [];
+        return list.filter(c => c.distributorId === distributorId);
     },
 
     async create(customerData) {
-        return new Promise((resolve, reject) => {
-            try {
+        if (ApiService.isServerAvailable()) {
+            const apiRes = await ApiService.post('customers.php', customerData);
+            if (apiRes && apiRes.success && apiRes.customer) {
                 const list = StorageService.get(StorageService.KEYS.CUSTOMERS) || [];
-                const newId = this.generateNextId(list);
-                const newCustomer = {
-                    id: newId,
-                    ...customerData,
-                    createdAt: new Date().toISOString()
-                };
-                list.unshift(newCustomer);
+                list.unshift(apiRes.customer);
                 StorageService.set(StorageService.KEYS.CUSTOMERS, list);
-                resolve({ success: true, customer: newCustomer });
-            } catch (err) {
-                reject({ success: false, message: err.message });
+                return { success: true, customer: apiRes.customer };
             }
-        });
+        }
+
+        // LocalStorage fallback
+        const list = StorageService.get(StorageService.KEYS.CUSTOMERS) || [];
+        const newId = this.generateNextId(list);
+        const newCustomer = {
+            id: newId,
+            ...customerData,
+            createdAt: new Date().toISOString()
+        };
+        list.unshift(newCustomer);
+        StorageService.set(StorageService.KEYS.CUSTOMERS, list);
+        return { success: true, customer: newCustomer };
     },
 
     async update(id, updatedData) {
-        return new Promise((resolve, reject) => {
-            try {
+        if (ApiService.isServerAvailable()) {
+            const apiRes = await ApiService.post('customers.php', { _action: 'PUT', id, ...updatedData });
+            if (apiRes && apiRes.success && apiRes.customer) {
                 const list = StorageService.get(StorageService.KEYS.CUSTOMERS) || [];
-                const index = list.findIndex(c => c.id === id);
-                if (index !== -1) {
-                    list[index] = { ...list[index], ...updatedData, id: id };
+                const idx = list.findIndex(c => c.id === id);
+                if (idx !== -1) {
+                    list[idx] = apiRes.customer;
                     StorageService.set(StorageService.KEYS.CUSTOMERS, list);
-                    resolve({ success: true, customer: list[index] });
-                } else {
-                    reject({ success: false, message: 'Customer not found for update' });
                 }
-            } catch (err) {
-                reject({ success: false, message: err.message });
+                return { success: true, customer: apiRes.customer };
             }
-        });
+        }
+
+        // LocalStorage fallback
+        const list = StorageService.get(StorageService.KEYS.CUSTOMERS) || [];
+        const index = list.findIndex(c => c.id === id);
+        if (index !== -1) {
+            list[index] = { ...list[index], ...updatedData, id: id };
+            StorageService.set(StorageService.KEYS.CUSTOMERS, list);
+            return { success: true, customer: list[index] };
+        }
+        throw new Error('Customer not found for update');
     },
 
     async delete(id) {
-        return new Promise((resolve, reject) => {
-            try {
+        if (ApiService.isServerAvailable()) {
+            const apiRes = await ApiService.post('customers.php', { _action: 'DELETE', id });
+            if (apiRes && apiRes.success) {
                 let list = StorageService.get(StorageService.KEYS.CUSTOMERS) || [];
-                const initialLength = list.length;
                 list = list.filter(c => c.id !== id);
-                if (list.length < initialLength) {
-                    StorageService.set(StorageService.KEYS.CUSTOMERS, list);
-                    resolve({ success: true });
-                } else {
-                    reject({ success: false, message: 'Customer not found for deletion' });
-                }
-            } catch (err) {
-                reject({ success: false, message: err.message });
+                StorageService.set(StorageService.KEYS.CUSTOMERS, list);
+                return { success: true };
             }
-        });
+        }
+
+        // LocalStorage fallback
+        let list = StorageService.get(StorageService.KEYS.CUSTOMERS) || [];
+        const initialLength = list.length;
+        list = list.filter(c => c.id !== id);
+        if (list.length < initialLength) {
+            StorageService.set(StorageService.KEYS.CUSTOMERS, list);
+            return { success: true };
+        }
+        throw new Error('Customer not found for deletion');
     },
 
     generateNextId(list) {

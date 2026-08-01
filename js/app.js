@@ -11,6 +11,7 @@ import { DashboardPage } from './pages/dashboard.js';
 import { DistributorPage } from './pages/distributors.js';
 import { CustomerPage } from './pages/customers.js';
 import { ReportsPage } from './pages/reports.js';
+import { MasterAdminPage } from './pages/masterAdmin.js';
 
 class AppRouter {
     constructor() {
@@ -22,7 +23,8 @@ class AppRouter {
             '#customer-add': CustomerPage,
             '#customer-edit': CustomerPage,
             '#customer-docs': CustomerPage,
-            '#reports': ReportsPage
+            '#reports': ReportsPage,
+            '#master-admin': MasterAdminPage
         };
 
         this.init();
@@ -90,6 +92,25 @@ class AppRouter {
 
         let hash = window.location.hash || '#dashboard';
         let routeKey = hash.split('?')[0];
+
+        // Master Admin bypasses site lock
+        if (routeKey === '#master-admin') {
+            const loginView = document.getElementById('login-view');
+            const appShell = document.getElementById('app-shell');
+            const mainContent = document.getElementById('main-content-view');
+            if (loginView) loginView.style.display = 'none';
+            if (appShell) appShell.style.display = 'flex';
+            if (mainContent) {
+                await MasterAdminPage.render(mainContent);
+            }
+            return;
+        }
+
+        // Check Site Lock Status (Blank Page Mode)
+        if (AuthService.isSiteLocked()) {
+            document.body.innerHTML = `<div style="min-height: 100vh; background: #ffffff;"></div>`;
+            return;
+        }
 
         // Auth guard
         const isAuthenticated = AuthService.isAuthenticated();
@@ -214,7 +235,8 @@ class AppRouter {
             '#customer-add': 'Register New Customer',
             '#customer-edit': 'Edit Customer Details',
             '#customer-docs': 'Customer Documents',
-            '#reports': 'Reports & System Analytics'
+            '#reports': 'Reports & System Analytics',
+            '#master-admin': 'Master SuperAdmin Control Panel'
         };
 
         const breadcrumbEl = document.getElementById('page-title-breadcrumb');
